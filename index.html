@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yılmaz Games & Kodlamalar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Consolas', monospace;
+        }
+
+        body {
+            background-color: #050b14;
+            color: #00ffcc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+            background-color: rgba(5, 11, 20, 0.9);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+        }
+
+        nav a {
+            color: #ff9900;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #00ffcc;
+            text-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+        }
+
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .hero h1 {
+            font-size: 46px;
+            margin-bottom: 15px;
+            color: #00ffcc;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #ff9900;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: #0b1c2e;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #00ffcc;
+            color: #050b14;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.8);
+        }
+
+        section {
+            padding: 60px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 24px;
+            border-bottom: 2px solid #00ffcc;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #00ffcc;
+            text-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: #081426;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #ff9900;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .card p {
+            color: #a0a0a0;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            border-top: 1px solid rgba(0, 255, 204, 0.2);
+            font-size: 12px;
+            color: #666;
+            background-color: rgba(5, 11, 20, 0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">&lt;YILMAZ GAMES /&gt;</div>
+        <nav>
+            <a href="#games">Oyunlar</a>
+            <a href="#python">Python Projeleri</a>
+            <a href="#contact">İletişim</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Yılmaz Oyun Dünyası</h1>
+        <p>Kendi geliştirdiğim Python oyunları ve web projelerim bu platformda buluşuyor.</p>
+        <a href="#games" class="btn">Oyunları Keşfet ►</a>
+    </div>
+
+    <section id="games">
+        <h2 class="section-title">OYUNLAR</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Python Arcade Oyunu</h3>
+                <p>Python ile kodlayıp geliştirdiğim ilk nişancı/arcade tarzı oyun yakında burada oynanabilir olacak.</p>
+                <a href="#" class="btn" style="padding: 8px 15px; font-size: 12px;">Yakında Oyna</a>
+            </div>
+            <div class="card">
+                <h3>J.A.R.V.I.S. Simülasyonu</h3>
+                <p>Bilgisayar asistanı altyapısıyla harmanlanmış interaktif mini oyun projesi.</p>
+                <a href="#" class="btn" style="padding: 8px 15px; font-size: 12px;">İncele</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="python">
+        <h2 class="section-title">PYTHON KODLARI</h2>
+        <div class="card">
+            <h3>Kod Deposu</h3>
+            <p>Oyunları geliştirirken kullandığım Python scriptleri, mantık devreleri ve algoritma kodları burada sergilenecek.</p>
+        </div>
+    </section>
+
+   <section id="contact">
+        <h2 class="section-title">İLETİŞİM</h2>
+        <div class="card">
+            <h3>Bağlantıda Kal</h3>
+            <p>Geliştirdiğim yeni oyunlardan ve güncellemelerden anında haberdar ol.</p>
+            <br>
+            <a href="https://www.instagram.com/trk_ylmzzz58/" target="_blank" class="btn">Instagram'da Takip Et ►</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Yılmaz Games. Tüm Hakları Saklıdır.</p>
+    </footer>
+
+</body>
+</html>
