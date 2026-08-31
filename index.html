@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yılmaz Games - Neon Drift</title>
+    <title>Yılmaz Games - Arcade Hub</title>
     <style>
         body {
             margin: 0;
@@ -19,164 +19,54 @@
             overflow: hidden;
         }
         h1 {
-            margin: 5px;
-            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-            font-size: 22px;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc;
         }
-        canvas {
-            border: 3px solid #ff0055;
-            box-shadow: 0 0 20px #ff0055, inset 0 0 20px #ff0055;
-            background: #050b14;
-        }
-        .info {
-            margin-top: 10px;
-            font-size: 14px;
+        p {
             color: #ff9900;
+            margin-bottom: 30px;
             text-shadow: 0 0 5px #ff9900;
+        }
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+        .game-btn {
+            background: transparent;
+            border: 2px solid #ff0055;
+            color: #ffffff;
+            padding: 15px;
+            font-size: 18px;
+            font-family: 'Consolas', monospace;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #ff0055;
+            transition: 0.3s;
+        }
+        .game-btn:hover {
+            background-color: #ff0055;
+            box-shadow: 0 0 20px #ff0055, 0 0 40px #ff0055;
+            color: #050b14;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h1>YILMAZ GAMES - NEON DRIFT</h1>
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-    <div class="info">Kontroller: A / D veya Sol / Sağ Yön Tuşları ile Şerit Değiştir</div>
+    <h1>YILMAZ GAMES HUB</h1>
+    <p>Oynamak istediğin oyunu seç ve maceraya başla!</p>
 
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+    <div class="game-list">
+        <!-- İlk oyunumuz -->
+        <a href="neon-drift.html" class="game-btn">🚗 Neon Drift</a>
+        <!-- Buraya ileride yeni oyunlar ekleyeceğiz -->
+        <a href="#" class="game-btn" style="opacity: 0.5; border-color: #555; box-shadow: none;">🚀 Yakında Yeni Oyun</a>
+    </div>
 
-        let carWidth = 45;
-        let carHeight = 80;
-        let lanes = [175, 275, 375, 475, 575];
-        let carX = lanes[2];
-        let carY = 380;
-
-        let obstacles = [];
-        let score = 0;
-        let isGameOver = false;
-        let keys = {};
-
-        window.addEventListener("keydown", (e) => {
-            keys[e.code] = true;
-            if (!isGameOver) {
-                if (e.code === "ArrowLeft" || e.code === "KeyA") {
-                    let idx = lanes.indexOf(carX);
-                    if (idx > 0) carX = lanes[idx - 1];
-                }
-                if (e.code === "ArrowRight" || e.code === "KeyD") {
-                    let idx = lanes.indexOf(carX);
-                    if (idx < lanes.length - 1) carX = lanes[idx + 1];
-                }
-            } else {
-                if (e.code === "KeyR") resetGame();
-            }
-        });
-
-        window.addEventListener("keyup", (e) => keys[e.code] = false);
-
-        function spawnObstacle() {
-            if (isGameOver) return;
-            let laneX = lanes[Math.floor(Math.random() * lanes.length)];
-            obstacles.push({ x: laneX, y: -100, width: carWidth, height: carHeight, speed: 6 });
-        }
-
-        setInterval(spawnObstacle, 900);
-
-        function resetGame() {
-            obstacles = [];
-            score = 0;
-            carX = lanes[2];
-            isGameOver = false;
-        }
-
-        function update() {
-            if (isGameOver) return;
-
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].y += obstacles[i].speed;
-
-                // Çarpışma kontrolü
-                if (
-                    carX < obstacles[i].x + obstacles[i].width &&
-                    carX + carWidth > obstacles[i].x &&
-                    carY < obstacles[i].y + obstacles[i].height &&
-                    carY + carHeight > obstacles[i].y
-                ) {
-                    isGameOver = true;
-                }
-
-                // Ekrandan çıkanlar
-                if (obstacles[i].y > canvas.height) {
-                    obstacles.splice(i, 1);
-                    score += 10;
-                }
-            }
-        }
-
-        function draw() {
-            // Arka plan
-            ctx.fillStyle = "#050b14";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Yol Kenarları (Neon Çizgiler)
-            ctx.strokeStyle = "#ff0055";
-            ctx.lineWidth = 4;
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = "#ff0055";
-            
-            ctx.beginPath();
-            ctx.moveTo(130, 0); ctx.lineTo(130, canvas.height);
-            ctx.moveTo(670, 0); ctx.lineTo(670, canvas.height);
-            ctx.stroke();
-
-            // Oyuncu Arabası
-            ctx.fillStyle = "#00ffcc";
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "#00ffcc";
-            ctx.fillRect(carX, carY, carWidth, carHeight);
-
-            // Ön cam detayı
-            ctx.fillStyle = "#050b14";
-            ctx.fillRect(carX + 8, carY + 15, carWidth - 16, 20);
-
-            // Engeller
-            ctx.fillStyle = "#ff9900";
-            ctx.shadowColor = "#ff9900";
-            for (let obs of obstacles) {
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-            }
-
-            // Skor Yazısı
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "20px Consolas";
-            ctx.fillText("SKOR: " + score, 20, 30);
-
-            // Game Over Ekranı
-            if (isGameOver) {
-                ctx.fillStyle = "rgba(5, 11, 20, 0.85)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = "#ff0055";
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = "#ff0055";
-                ctx.font = "35px Consolas";
-                ctx.fillText("SİSTEM ÇÖKTÜ (GAME OVER)", 110, 200);
-
-                ctx.fillStyle = "#00ffcc";
-                ctx.font = "18px Consolas";
-                ctx.fillText("Yeniden başlamak için 'R' tuşuna bas", 220, 260);
-            }
-        }
-
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        loop();
-    </script>
 </body>
 </html>
