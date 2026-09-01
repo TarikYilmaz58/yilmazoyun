@@ -149,7 +149,6 @@
 </head>
 <body>
 
-    <!-- ANA MENÜ -->
     <div id="main-menu">
         <h1>YILMAZ GAMESHUB</h1>
         <div class="subtitle">ARCADE HUB</div>
@@ -159,7 +158,6 @@
         </div>
     </div>
 
-    <!-- OYUN ALANI -->
     <div id="game-container">
         <div class="game-header">
             <button class="back-btn" id="btn-back">← Ana Menü</button>
@@ -195,7 +193,8 @@
         // --- NINJA STRIKE DEĞİŞKENLERİ ---
         let score = 0;
         let gameRunning = true;
-        let timeLeft = 120; // 2 Dakika (120 Saniye)
+        let timeLeft = 120;
+        let dartsLeft = 20;
         let timerInterval = null;
 
         let targetX = 350;
@@ -204,7 +203,7 @@
         let targetRadius = 45;
 
         let dartX = 350;
-        let dartY = 680;
+        let dartY = 480; 
         let isFlying = false;
         let dartSpeed = 40;
 
@@ -266,9 +265,10 @@
         setInterval(() => {
             if (currentGame === 'drift' && !isDriftOver) {
                 let laneX = lanes[Math.floor(Math.random() * lanes.length)];
-                obstacles.push({ x: laneX, y: -100, width: carWidth, height: carHeight, speed: 6 });
+                // Araçların çıkış sıklığı da hızlandırıldı (Hız: 11)
+                obstacles.push({ x: laneX, y: -100, width: carWidth, height: carHeight, speed: 11 });
             }
-        }, 900);
+        }, 650);
 
         // --- NINJA MANTIĞI ---
         function throwDart() {
@@ -277,19 +277,26 @@
                 resetGame();
                 return;
             }
-            if (!isFlying) {
+            if (!isFlying && dartsLeft > 0) {
                 isFlying = true;
+                dartsLeft--;
             }
         }
 
         function resetDart() {
             isFlying = false;
-            dartY = 680;
+            dartY = 480;
+            
+            if (dartsLeft <= 0) {
+                gameRunning = false;
+                clearInterval(timerInterval);
+            }
         }
 
         function resetGame() {
             score = 0;
             timeLeft = 120;
+            dartsLeft = 20;
             gameRunning = true;
             resetDart();
             startTimer();
@@ -475,10 +482,10 @@
                 drawDart(dartX, dartY);
 
                 ctx.fillStyle = "#89b4fa";
-                ctx.font = "bold 16px Consolas";
-                ctx.fillText(`SKOR: ${score}`, 30, 35);
+                ctx.font = "bold 15px Consolas";
+                ctx.fillText(`SKOR: ${score}`, 20, 35);
+                ctx.fillText(`DART: ${dartsLeft}/20`, 160, 35);
 
-                // Süreyi dakika:saniye formatında göster
                 let minutes = Math.floor(timeLeft / 60);
                 let seconds = timeLeft % 60;
                 let formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
@@ -493,7 +500,7 @@
                     ctx.fillStyle = "#cdd6f4";
                     ctx.font = "bold 22px Consolas";
                     ctx.textAlign = "center";
-                    ctx.fillText("SÜRE BİTTİ!", canvas.width / 2, canvas.height / 2 - 30);
+                    ctx.fillText("OYUN BİTTİ!", canvas.width / 2, canvas.height / 2 - 30);
                     ctx.fillText(`Toplam Skor: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
                     
                     ctx.font = "bold 14px Consolas";
