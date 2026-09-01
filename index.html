@@ -3,194 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ninja Strike</title>
+    <title>Yılmaz Oyun Merkezi</title>
     <style>
         body {
-            margin: 0;
-            background-color: #1e1e2e;
+            background-color: #0f1016;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             height: 100vh;
-            font-family: 'Consolas', monospace;
-            color: #cdd6f4;
-            overflow: hidden;
+            margin: 0;
         }
         h1 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
-            color: #f38ba8;
+            color: #ff3366;
+            margin-bottom: 10px;
+            font-size: 2.8rem;
             letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
         }
-        canvas {
-            background-color: #1e1e2e;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        p {
+            color: #8b9bb4;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .menu-container {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .game-btn {
+            background: linear-gradient(135deg, #1f2233, #151824);
+            color: white;
+            border: 2px solid #ff3366;
+            padding: 25px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 15px;
             cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 180px;
+        }
+        .game-btn span {
+            font-size: 0.85rem;
+            color: #00ffcc;
+            font-weight: normal;
+        }
+        .game-btn:hover {
+            transform: translateY(-5px);
+            border-color: #00ffcc;
+            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.3);
+            background: linear-gradient(135deg, #25293d, #1a1d2e);
         }
     </style>
 </head>
 <body>
 
-    <!-- Sitede görünecek oyun ismi -->
-    <h1>NİNJA STRIKE</h1>
+    <h1>OYUN MERKEZİ</h1>
+    <p>Oynamak istediğin oyunu seç ve başla!</p>
+    
+    <div class="menu-container">
+        <a href="neon-drift.html" class="game-btn">
+            🚗 Neon Drift
+            <span>Şerit Değiştirme Oyunu</span>
+        </a>
+        <a href="ninja-saldırısı.html" class="game-btn">
+            🥷 Ninja Strike
+            <span>Dart / Hedef Oyunu</span>
+        </a>
+    </div>
 
-    <canvas id="gameCanvas" width="700" height="750"></canvas>
-
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        let score = 0;
-        let dartsLeft = 15;
-        let gameRunning = true;
-
-        let targetX = 350;
-        let targetY = 160;
-        let targetDx = 8.5;
-        let targetRadius = 45;
-
-        let dartX = 350;
-        let dartY = 680;
-        let isFlying = false;
-        let dartSpeed = 40;
-
-        function throwDart() {
-            if (!gameRunning) {
-                resetGame();
-                return;
-            }
-            if (!isFlying && dartsLeft > 0) {
-                isFlying = true;
-                dartsLeft--;
-            }
-        }
-
-        window.addEventListener("keydown", (e) => {
-            if (e.code === "Space") {
-                e.preventDefault();
-                throwDart();
-            }
-        });
-
-        canvas.addEventListener("click", throwDart);
-
-        function update() {
-            if (gameRunning) {
-                targetX += targetDx;
-                if (targetX - targetRadius < 40 || targetX + targetRadius > 660) {
-                    targetDx *= -1;
-                }
-
-                if (isFlying) {
-                    dartY -= dartSpeed;
-                    let dist = Math.sqrt((dartX - targetX) ** 2 + (dartY - targetY) ** 2);
-                    
-                    if (dist < 45) {
-                        if (dist < 7) score += 100;
-                        else if (dist < 15) score += 50;
-                        else if (dist < 26) score += 25;
-                        else score += 10;
-                        resetDart();
-                    } else if (dartY < 0) {
-                        resetDart();
-                    }
-                }
-            }
-        }
-
-        function drawTarget(x, y) {
-            const colors = ["#11111b", "#45475a", "#cdd6f4", "#f38ba8", "#a6e3a1", "#f9e2af"];
-            const radii = [45, 38, 26, 15, 7, 3];
-            const outlines = ["#f38ba8", "", "", "", "", ""];
-
-            for (let i = 0; i < radii.length; i++) {
-                ctx.beginPath();
-                ctx.arc(x, y, radii[i], 0, Math.PI * 2);
-                ctx.fillStyle = colors[i];
-                ctx.fill();
-                if (outlines[i]) {
-                    ctx.strokeStyle = outlines[i];
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
-                }
-            }
-        }
-
-        function drawDart(dx, dy) {
-            ctx.fillStyle = "#fab387";
-            ctx.strokeStyle = "#f38ba8";
-            ctx.lineWidth = 2;
-
-            ctx.beginPath();
-            ctx.moveTo(dx, dy - 18);
-            ctx.lineTo(dx - 4, dy - 8);
-            ctx.lineTo(dx - 10, dy + 5);
-            ctx.lineTo(dx - 4, dy + 2);
-            ctx.lineTo(dx, dy + 15);
-            ctx.lineTo(dx + 4, dy + 2);
-            ctx.lineTo(dx + 10, dy + 5);
-            ctx.lineTo(dx + 4, dy - 8);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawTarget(targetX, targetY);
-            drawDart(dartX, dartY);
-
-            ctx.fillStyle = "#89b4fa";
-            ctx.font = "bold 16px Consolas";
-            ctx.fillText(`SKOR: ${score}`, 30, 35);
-
-            ctx.fillStyle = "#fab387";
-            ctx.fillText(`DART: ${dartsLeft}`, 600, 35);
-
-            if (!gameRunning) {
-                ctx.fillStyle = "rgba(30, 30, 46, 0.85)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = "#cdd6f4";
-                ctx.font = "bold 22px Consolas";
-                ctx.textAlign = "center";
-                ctx.fillText("OYUN BİTTİ!", canvas.width / 2, canvas.height / 2 - 30);
-                ctx.fillText(`Toplam Skor: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
-                
-                ctx.font = "bold 14px Consolas";
-                ctx.fillStyle = "#89b4fa";
-                ctx.fillText("Tekrar oynamak için tıkla veya boşluğa bas", canvas.width / 2, canvas.height / 2 + 60);
-                ctx.textAlign = "left";
-            } else if (dartsLeft === 15 && !isFlying && dartY === 680) {
-                ctx.fillStyle = "#cdd6f4";
-                ctx.font = "bold 14px Consolas";
-                ctx.textAlign = "center";
-                ctx.fillText("Fırlatmak için Ekrana Tıkla veya Boşluk tuşuna bas!", canvas.width / 2, 380);
-                ctx.textAlign = "left";
-            }
-        }
-
-        function resetDart() {
-            isFlying = false;
-            dartY = 680;
-        }
-
-        function resetGame() {
-            score = 0;
-            dartsLeft = 15;
-            gameRunning = true;
-            resetDart();
-        }
-
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        loop();
-    </script>
 </body>
 </html>
