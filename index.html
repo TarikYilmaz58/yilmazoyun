@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Yılmaz GamesHub - Arcade Hub</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #080c14;
+            color: #00ffcc;
+            font-family: 'Consolas', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Ana Menü Ekranı */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            height: 100vh;
+            background: radial-gradient(circle, #101930 0%, #080c14 100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+        h1 {
+            color: #ff3366;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.6);
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            color: #8b9bb4;
+            margin-bottom: 35px;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+        }
+        .menu-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .menu-btn {
+            background: linear-gradient(135deg, #151a2e, #0d111a);
+            color: #ffffff;
+            border: 2px solid #00ffcc;
+            padding: 20px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            transition: all 0.3s ease;
+            font-family: 'Consolas', monospace;
+        }
+        .menu-btn:hover {
+            background-color: #00ffcc;
+            color: #080c14;
+            box-shadow: 0 0 25px #00ffcc;
+            transform: translateY(-3px);
+        }
+
+        /* Oyun Ekranı */
+        #game-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+        }
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 700px;
+            max-width: 100%;
+            padding: 0 10px 8px 10px;
+        }
+        .game-title {
+            font-size: 18px;
+            text-shadow: 0 0 10px #00ffcc;
+            margin: 0;
+        }
+        .back-btn {
+            background: transparent;
+            color: #ff9900;
+            border: 1px solid #ff9900;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Consolas', monospace;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #ff9900;
+            color: #080c14;
+        }
+        canvas {
+            border: 3px solid #ff0055;
+            box-shadow: 0 0 20px #ff0055;
+            background: #1e1e2e;
+            max-width: 100%;
+            height: auto;
+        }
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .ctrl-btn {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            font-size: 22px;
+            padding: 8px 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+            cursor: pointer;
+            font-family: 'Consolas', monospace;
+        }
+        .ctrl-btn:active {
+            background-color: #00ffcc;
+            color: #050b14;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ANA MENÜ -->
+    <div id="main-menu">
+        <h1>YILMAZ GAMESHUB</h1>
+        <div class="subtitle">ARCADE HUB</div>
+        <div class="menu-buttons">
+            <button class="menu-btn" id="btn-drift">🚗 Neon Drift</button>
+            <button class="menu-btn" id="btn-ninja">🎯 Ninja Strike</button>
+        </div>
+    </div>
+
+    <!-- OYUN ALANI -->
+    <div id="game-container">
+        <div class="game-header">
+            <button class="back-btn" id="btn-back">← Ana Menü</button>
+            <h2 id="active-game-title" class="game-title">OYUN</h2>
+            <div style="width: 70px;"></div>
+        </div>
+
+        <canvas id="gameCanvas" width="700" height="750"></canvas>
+        
+        <div class="controls" id="drift-controls" style="display: none;">
+            <button class="ctrl-btn" id="ctrl-left">◀</button>
+            <button class="ctrl-btn" id="ctrl-right">▶</button>
+        </div>
+    </div>
+
+    <script>
+        const mainMenu = document.getElementById("main-menu");
+        const gameContainer = document.getElementById("game-container");
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const titleEl = document.getElementById("active-game-title");
+        const driftControls = document.getElementById("drift-controls");
+
+        let currentGame = null;
+        let animationFrameId = null;
+
+        // --- NEON DRIFT DEĞİŞKENLERİ ---
+        let carWidth = 45, carHeight = 80;
+        let lanes = [175, 275, 375, 475, 575];
+        let carX = lanes[2], carY = 280;
+        let obstacles = [], driftScore = 0, isDriftOver = false;
+
+        // --- NINJA STRIKE DEĞİŞKENLERİ ---
+        let score = 0;
+        let gameRunning = true;
+        let timeLeft = 120; // 2 Dakika (120 Saniye)
+        let timerInterval = null;
+
+        let targetX = 350;
+        let targetY = 160;
+        let targetDx = 11.5;
+        let targetRadius = 45;
+
+        let dartX = 350;
+        let dartY = 680;
+        let isFlying = false;
+        let dartSpeed = 40;
+
+        // Olay Dinleyicileri (Event Listeners)
+        document.getElementById("btn-drift").addEventListener("click", () => startGame('drift'));
+        document.getElementById("btn-ninja").addEventListener("click", () => startGame('ninja'));
+        document.getElementById("btn-back").addEventListener("click", returnToMenu);
+        document.getElementById("ctrl-left").addEventListener("click", handleDriftLeft);
+        document.getElementById("ctrl-right").addEventListener("click", handleDriftRight);
+
+        function startGame(type) {
+            mainMenu.style.display = "none";
+            gameContainer.style.display = "flex";
+            currentGame = type;
+            
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            if (type === 'drift') {
+                titleEl.innerText = "NEON DRIFT";
+                driftControls.style.display = "flex";
+                resetDrift();
+                loop();
+            } else if (type === 'ninja') {
+                titleEl.innerText = "NINJA STRIKE";
+                driftControls.style.display = "none";
+                resetNinja();
+                loop();
+            }
+        }
+
+        function returnToMenu() {
+            cancelAnimationFrame(animationFrameId);
+            clearInterval(timerInterval);
+            gameContainer.style.display = "none";
+            mainMenu.style.display = "flex";
+            currentGame = null;
+        }
+
+        // --- DRIFT MANTIĞI ---
+        function resetDrift() {
+            obstacles = [];
+            driftScore = 0;
+            carX = lanes[2];
+            isDriftOver = false;
+        }
+
+        function handleDriftLeft() {
+            if (isDriftOver) { resetDrift(); return; }
+            let idx = lanes.indexOf(carX);
+            if (idx > 0) carX = lanes[idx - 1];
+        }
+
+        function handleDriftRight() {
+            if (isDriftOver) { resetDrift(); return; }
+            let idx = lanes.indexOf(carX);
+            if (idx < lanes.length - 1) carX = lanes[idx + 1];
+        }
+
+        setInterval(() => {
+            if (currentGame === 'drift' && !isDriftOver) {
+                let laneX = lanes[Math.floor(Math.random() * lanes.length)];
+                obstacles.push({ x: laneX, y: -100, width: carWidth, height: carHeight, speed: 6 });
+            }
+        }, 900);
+
+        // --- NINJA MANTIĞI ---
+        function throwDart() {
+            if (currentGame !== 'ninja') return;
+            if (!gameRunning) {
+                resetGame();
+                return;
+            }
+            if (!isFlying) {
+                isFlying = true;
+            }
+        }
+
+        function resetDart() {
+            isFlying = false;
+            dartY = 680;
+        }
+
+        function resetGame() {
+            score = 0;
+            timeLeft = 120;
+            gameRunning = true;
+            resetDart();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (gameRunning && currentGame === 'ninja') {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        gameRunning = false;
+                        clearInterval(timerInterval);
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetNinja() {
+            resetGame();
+            targetX = 350;
+            targetY = 160;
+            targetDx = 11.5;
+        }
+
+        function drawTarget(x, y) {
+            const colors = ["#11111b", "#45475a", "#cdd6f4", "#f38ba8", "#a6e3a1", "#f9e2af"];
+            const radii = [45, 38, 26, 15, 7, 3];
+            const outlines = ["#f38ba8", "", "", "", "", ""];
+
+            for (let i = 0; i < radii.length; i++) {
+                ctx.beginPath();
+                ctx.arc(x, y, radii[i], 0, Math.PI * 2);
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                if (outlines[i]) {
+                    ctx.strokeStyle = outlines[i];
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawDart(dx, dy) {
+            ctx.fillStyle = "#fab387";
+            ctx.strokeStyle = "#f38ba8";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(dx, dy - 18);
+            ctx.lineTo(dx - 4, dy - 8);
+            ctx.lineTo(dx - 10, dy + 5);
+            ctx.lineTo(dx - 4, dy + 2);
+            ctx.lineTo(dx, dy + 15);
+            ctx.lineTo(dx + 4, dy + 2);
+            ctx.lineTo(dx + 10, dy + 5);
+            ctx.lineTo(dx + 4, dy - 8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // --- KONTROLLER VE DÖNGÜ ---
+        window.addEventListener("keydown", (e) => {
+            if (currentGame === 'drift') {
+                if (!isDriftOver) {
+                    if (e.code === "ArrowLeft" || e.code === "KeyA") handleDriftLeft();
+                    if (e.code === "ArrowRight" || e.code === "KeyD") handleDriftRight();
+                } else {
+                    if (e.code === "KeyR" || e.code === "Space") resetDrift();
+                }
+            } else if (currentGame === 'ninja') {
+                if (e.code === "Space") {
+                    e.preventDefault();
+                    throwDart();
+                }
+            }
+        });
+
+        canvas.addEventListener("click", () => {
+            if (currentGame === 'ninja') {
+                throwDart();
+            }
+        });
+
+        function update() {
+            if (currentGame === 'drift') {
+                if (isDriftOver) return;
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    obstacles[i].y += obstacles[i].speed;
+                    if (
+                        carX < obstacles[i].x + obstacles[i].width &&
+                        carX + carWidth > obstacles[i].x &&
+                        carY < obstacles[i].y + obstacles[i].height &&
+                        carY + carHeight > obstacles[i].y
+                    ) {
+                        isDriftOver = true;
+                    }
+                    if (obstacles[i].y > canvas.height) {
+                        obstacles.splice(i, 1);
+                        driftScore += 10;
+                    }
+                }
+            } else if (currentGame === 'ninja') {
+                if (gameRunning) {
+                    targetX += targetDx;
+                    if (targetX - targetRadius < 40 || targetX + targetRadius > 660) {
+                        targetDx *= -1;
+                    }
+
+                    if (isFlying) {
+                        dartY -= dartSpeed;
+                        let dist = Math.sqrt((dartX - targetX) ** 2 + (dartY - targetY) ** 2);
+                        
+                        if (dist < 45) {
+                            if (dist < 7) score += 100;
+                            else if (dist < 15) score += 50;
+                            else if (dist < 26) score += 25;
+                            else score += 10;
+                            resetDart();
+                        } else if (dartY < 0) {
+                            resetDart();
+                        }
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (currentGame === 'drift') {
+                ctx.fillStyle = "#050b14";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = "#ff0055";
+                ctx.lineWidth = 4;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = "#ff0055";
+                ctx.beginPath();
+                ctx.moveTo(130, 0); ctx.lineTo(130, canvas.height);
+                ctx.moveTo(670, 0); ctx.lineTo(670, canvas.height);
+                ctx.stroke();
+
+                ctx.fillStyle = "#00ffcc";
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "#00ffcc";
+                ctx.fillRect(carX, carY, carWidth, carHeight);
+
+                ctx.fillStyle = "#050b14";
+                ctx.fillRect(carX + 8, carY + 15, carWidth - 16, 20);
+
+                ctx.fillStyle = "#ff9900";
+                ctx.shadowColor = "#ff9900";
+                for (let obs of obstacles) {
+                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                }
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "18px Consolas";
+                ctx.fillText("SKOR: " + driftScore, 20, 30);
+
+                if (isDriftOver) {
+                    ctx.fillStyle = "rgba(5, 11, 20, 0.85)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.fillStyle = "#ff0055";
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = "#ff0055";
+                    ctx.font = "24px Consolas";
+                    ctx.fillText("SİSTEM ÇÖKTÜ (GAME OVER)", 140, 150);
+
+                    ctx.fillStyle = "#00ffcc";
+                    ctx.font = "14px Consolas";
+                    ctx.fillText("Yeniden başlamak için dokun veya 'R' bas", 170, 200);
+                }
+
+            } else if (currentGame === 'ninja') {
+                ctx.shadowBlur = 0;
+                drawTarget(targetX, targetY);
+                drawDart(dartX, dartY);
+
+                ctx.fillStyle = "#89b4fa";
+                ctx.font = "bold 16px Consolas";
+                ctx.fillText(`SKOR: ${score}`, 30, 35);
+
+                // Süreyi dakika:saniye formatında göster
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                let formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                ctx.fillStyle = "#fab387";
+                ctx.fillText(`SÜRE: ${formattedTime}`, 550, 35);
+
+                if (!gameRunning) {
+                    ctx.fillStyle = "rgba(30, 30, 46, 0.85)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.fillStyle = "#cdd6f4";
+                    ctx.font = "bold 22px Consolas";
+                    ctx.textAlign = "center";
+                    ctx.fillText("SÜRE BİTTİ!", canvas.width / 2, canvas.height / 2 - 30);
+                    ctx.fillText(`Toplam Skor: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
+                    
+                    ctx.font = "bold 14px Consolas";
+                    ctx.fillStyle = "#89b4fa";
+                    ctx.fillText("Tekrar oynamak için tıkla veya boşluğa bas", canvas.width / 2, canvas.height / 2 + 60);
+                    ctx.textAlign = "left";
+                }
+            }
+        }
+
+        function loop() {
+            if (currentGame) {
+                update();
+                draw();
+                animationFrameId = requestAnimationFrame(loop);
+            }
+        }
+    </script>
+</body>
+</html>
