@@ -72,7 +72,7 @@
         <button class="ctrl-btn" onclick="moveRight()">▶</button>
     </div>
 
-    <a href="index.html" class="back-btn">← Ana Menü</a>
+    <a href="./index.html" class="back-btn">← Ana Menü</a>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
@@ -106,7 +106,6 @@
             if (idx < lanes.length - 1) carX = lanes[idx + 1];
         }
 
-        // Klavye desteği (Bilgisayar için)
         window.addEventListener("keydown", (e) => {
             if (!isGameOver) {
                 if (e.code === "ArrowLeft" || e.code === "KeyA") moveLeft();
@@ -116,7 +115,6 @@
             }
         });
 
-        // Ekrana dokunma desteği (Mobil için - Sol taraf sola, sağ taraf sağa kaydırır)
         canvas.addEventListener("touchstart", (e) => {
             let touchX = e.touches[0].clientX;
             if (isGameOver) {
